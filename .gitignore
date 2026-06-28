@@ -1,0 +1,10 @@
+.idea
+.vs
+.vscode
+.zed
+.cursor
+
+vendor/
+*temp*/
+.claude
+out/
