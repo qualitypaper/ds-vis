@@ -8,8 +8,8 @@ int main(void) {
 	W_Init("graph-vis");
 	R_Init();
 
-	int preorder[] = { 10, 5, 3, 7, 15 };
-	int inorder[]  = {  3, 5, 7, 10, 15 };
+	int preorder[] = { 10, 5, 3, 7, 15, 13 };
+	int inorder[]  = {  3, 5, 7, 10, 13, 15 };
 	struct BT bt = BT_Init(preorder, inorder, 5);
 
 	for (done = false; !done; ) {

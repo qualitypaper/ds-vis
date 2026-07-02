@@ -7,9 +7,9 @@ struct Node* BT_Build(int preorder[], int inorder[], int ilower, int iupper, int
 	int root = preorder[index];
 
 	int iindex = ilower;
-	while (iindex < iupper && inorder[iindex] != root) ++iindex;
+	while (iindex <= iupper && inorder[iindex] != root) ++iindex;
 
-	int leftSize = min(0, iindex - ilower);
+	int leftSize = iindex - ilower;
 
 	struct Node* node = (struct Node*)malloc(sizeof(struct Node));
 	node->left = BT_Build(preorder, inorder, ilower, iindex - 1, index + 1);
@@ -23,8 +23,39 @@ struct Node* BT_Build(int preorder[], int inorder[], int ilower, int iupper, int
 }
 
 struct BT BT_Init(int preorder[], int inorder[], size_t len) {
-	struct BT bt = { BT_Build(preorder, inorder, 0, len - 1, 0), len };
+	struct BT bt = { BT_Build(preorder, inorder, 0, len-1, 0), len };
 	return bt;
+}
+
+size_t BT_MaxDepth(struct BT* tree) {
+	if (!tree || !tree->root) return 0;
+
+	size_t maxDepth = 0;
+	struct AQueue depth = AQ_Init(tree->size);
+	struct NQueue queue = NQueue_Init(tree->size/2);
+	NQueue_Enqueue(tree->root, &queue);
+	AQ_Enqueue(1, &depth);
+
+	while (!NQueue_IsEmpty(&queue)) {
+		int dep = AQ_Dequeue(&depth);
+		struct Node* node = NQueue_Dequeue(&queue);
+
+		if (node->left) {
+			NQueue_Enqueue(node->left, &queue);
+			AQ_Enqueue(dep + 1, &depth);
+		}
+
+		if (node->right) {
+			NQueue_Enqueue(node->right, &queue);
+			AQ_Enqueue(dep + 1, &depth);
+		}
+
+		if (dep > maxDepth) {
+			maxDepth = dep;
+		}
+	}
+
+	return maxDepth;
 }
 
 void BT_Add(int val, struct BT* tree) {

@@ -17,6 +17,7 @@ struct Node {
 DEFINE_LIST(struct Node*, NList)
 DEFINE_QUEUE(struct Node*, NQueue)
 
+
 struct BT {
 	struct Node* root;
 	size_t size;
@@ -24,6 +25,7 @@ struct BT {
 
 struct Node* BT_Build(int preorder[], int inorder[], int ilower, int iupper, int index);
 struct BT    BT_Init(int preorder[], int inorder[], size_t len);
+size_t BT_MaxDepth(struct BT* tree);
 void         BT_Add(int val, struct BT* tree);
 void         BT_Transplant(struct Node* root, struct Node* node, struct Node* newNode);
 void         BT_Del(struct Node* node, struct BT* tree);
