@@ -1,9 +1,4 @@
-#ifndef GRAPH_VIS_QUEUE
-#define GRAPH_VIS_QUEUE
-
-#include "list.h"
-
-struct AQueue { struct List list; };
+#include "queue.h"
 
 struct AQueue AQ_Init(size_t cap) {
 	struct AQueue q = { L_Init(cap) };
@@ -19,13 +14,6 @@ int AQ_Dequeue(struct AQueue* q) {
 }
 
 int AQ_IsEmpty(struct AQueue* q) { return q->list.len == 0; }
-
-
-// Fixed-size ring buffer queue
-struct FQueue {
-	int* arr;
-	size_t head, tail, len, cap;
-};
 
 struct FQueue FQ_Init(size_t cap) {
 	struct FQueue q = { (int*) malloc(cap * sizeof(int)), 0, 0, 0, cap };
@@ -47,5 +35,3 @@ int FQ_Dequeue(struct FQueue* q) {
 
 int FQ_IsEmpty(struct FQueue* q) { return q->len == 0; }
 int FQ_IsFull(struct FQueue* q)  { return q->len == q->cap; }
-
-#endif

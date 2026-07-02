@@ -6,8 +6,7 @@ set(CIMGUI_DIR "${PROJECT_SOURCE_DIR}/vendor/cimgui")
 add_library(imgui_backends STATIC
     "${CIMGUI_DIR}/cimgui_impl.cpp"
     "${CIMGUI_DIR}/imgui/backends/imgui_impl_sdl3.cpp"
-    "${CIMGUI_DIR}/imgui/backends/imgui_impl_sdlrenderer3.cpp"
-)
+    "${CIMGUI_DIR}/imgui/backends/imgui_impl_sdlrenderer3.cpp")
 target_compile_definitions(imgui_backends PRIVATE CIMGUI_USE_SDL3=1)
 target_include_directories(imgui_backends PRIVATE
     "${CIMGUI_DIR}/imgui"
@@ -16,10 +15,11 @@ target_include_directories(imgui_backends PRIVATE
 target_link_libraries(imgui_backends PRIVATE cimgui SDL3::SDL3)
 set_property(TARGET imgui_backends PROPERTY CXX_STANDARD 20)
 
-add_executable(graph-vis "main.c" "bt.h" "list.h" "queue.h" "window.h")
+add_executable(graph-vis "main.c" "window.c" "window.h" "ds/bt.c" "ds/bt.h" "ds/list.c" "ds/list.h" "ds/queue.c" "ds/queue.h" "engine/tree_render.h" "engine/tree_render.c")
 set_property(TARGET graph-vis PROPERTY C_STANDARD 17)
 target_compile_definitions(graph-vis PRIVATE
     CIMGUI_DEFINE_ENUMS_AND_STRUCTS=1
     CIMGUI_USE_SDL3=1
 )
+target_include_directories(graph-vis PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(graph-vis PRIVATE cimgui imgui_backends SDL3::SDL3)
