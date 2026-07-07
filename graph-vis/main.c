@@ -18,7 +18,7 @@ int main(void) {
 		W_StartFrame();
 
 		//igShowDemoWindow(NULL);
-		R_RenderTree(&bt);
+		R_TreeFrame(bt.root);
 
 		W_EndFrame();
 	}

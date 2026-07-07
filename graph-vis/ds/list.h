@@ -18,7 +18,7 @@ void        L_Add(int val, struct List* list);
 void        L_Del(size_t index, struct List* list);
 
 #define DEFINE_LIST(T, Name)                                                                          \
-struct Name { T* arr; size_t len, cap; };                                                             \
+typedef struct Name { T* arr; size_t len, cap; } Name;                                                             \
 static inline struct Name Name##_Init(size_t cap) {                                                   \
     struct Name l = { (T*) malloc(cap * sizeof(T)), 0, cap };                                         \
     return l;                                                                                         \

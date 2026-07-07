@@ -3,7 +3,7 @@
 
 #include "list.h"
 
-struct AQueue { struct List list; };
+typedef struct AQueue { struct List list; } AQueue;
 
 struct AQueue AQ_Init(size_t cap);
 void          AQ_Enqueue(int val, struct AQueue* q);
@@ -22,7 +22,7 @@ int           FQ_IsEmpty(struct FQueue* q);
 int           FQ_IsFull(struct FQueue* q);
 
 #define DEFINE_QUEUE(T, Name)                                                                         \
-struct Name { T* arr; size_t head, tail, len, cap; };                                                 \
+typedef struct Name { T* arr; size_t head, tail, len, cap; } Name;                                                 \
 static inline struct Name Name##_Init(size_t cap) {                                                   \
     struct Name q = { (T*) malloc(cap * sizeof(T)), 0, 0, 0, cap };                                  \
     return q;                                                                                         \
