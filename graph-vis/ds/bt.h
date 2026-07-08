@@ -24,7 +24,7 @@ void     BT_Transplant(Node* root, Node* node, Node* newNode);
 void     BT_Del(Node* node, BT* tree);
 void     BT_DelByVal(int val, BT* tree);
 
-Node* BST_Build(int preorder[], size_t index, size_t upper);
+Node* BST_Build(int preorder[], int index, int upper);
 BT       BST_Init(int preorder[], size_t len);
 Node* BST_Search(int val, BT* bt);
 void     BST_Add(int val, BT* bt);

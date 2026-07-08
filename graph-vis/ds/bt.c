@@ -92,14 +92,14 @@ void BT_DelByVal(int val, struct BT* tree) {
 	}
 }
 
-Node* BST_Build(int preorder[], size_t index, size_t upper) {
+Node* BST_Build(int preorder[], int index, int upper) {
 	if (index > upper) return NULL;
 
 	int root = preorder[index];
 
 	Node* node = Node_Alloc(root, 2);
 
-	size_t rightChildIndex = index + 1;
+	int rightChildIndex = index + 1;
 	while (rightChildIndex <= upper && preorder[rightChildIndex] <= root)
 		rightChildIndex++;
 

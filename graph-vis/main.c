@@ -8,9 +8,8 @@ int main(void) {
 	W_Init("graph-vis");
 	R_Init();
 
-	int preorder[] = { 10, 5, 3, 7, 15, 13 };
-	int inorder[]  = {  3, 5, 7, 10, 13, 15 };
-	struct BT bt = BT_Init(preorder, inorder, 5);
+	int preorder[] = { 10, 5, 3, 7, 8, 15, 13, 11 };
+	struct BT bt = BST_Init(preorder, 8);
 
 	for (done = false; !done; ) {
 		if (!W_PollEvents()) continue;
@@ -18,7 +17,7 @@ int main(void) {
 		W_StartFrame();
 
 		//igShowDemoWindow(NULL);
-		R_TreeFrame(bt.root);
+		R_TreeFrame(bt.root, 160, 100);
 
 		W_EndFrame();
 	}
