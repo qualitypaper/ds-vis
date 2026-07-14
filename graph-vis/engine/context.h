@@ -4,11 +4,10 @@
 #include "defs.h"
 #include "arena.h"
 #include "cmd.h"
-#include <stdbool.h>
 
 typedef struct NodeUIState {
 	ID id;
-	bool expanded;
+	int8_t expanded;
 	float x, y;
 } NodeUIState;
 
@@ -22,7 +21,7 @@ typedef struct UIContext {
 	UIStateMap* uiStateMap;
 
 	float mouseX, mouseY;
-	bool mouseDown, mousePressed, mouseReleased;
+	int8_t mouseDown, mousePressed, mouseReleased;
 
 	ID hotId;
 	ID activeId;
@@ -30,9 +29,15 @@ typedef struct UIContext {
 	DrawCmd* drawCmds;
 	int drawCmdCount;
 	int drawCmdCap;
+
+	TreeCmd* treeCmds;
+	int treeCmdCount;
+	int treeCmdCap;
+
 } UIContext;
 
 void CTX_AddCmd(UIContext* ctx, DrawCmd cmd);
+void CTX_AddTreeCmd(UIContext* ctx, TreeCmd cmd);
 NodeUIState* CTX_UIGetOrCreate(UIStateMap* uiState, ID elemId);
 
 #endif

@@ -1,9 +1,10 @@
 #include "cmd.h"
 #include "window.h"
+#include "ds/bt.h"
 
 #define FONT_SIZE 30
 
-void CMD_ProcessCommand(DrawCmd* cmd)
+void CMD_ProcessDrawCommand(DrawCmd* cmd)
 {
 	ImDrawList* dl = igGetForegroundDrawList_ViewportPtr(NULL);
 	ImVec2_c p0 = { cmd->x0, cmd->y0 };
@@ -35,4 +36,45 @@ void CMD_ProcessCommand(DrawCmd* cmd)
 	} break;
 	default: break;
 	}
+}
+
+void CMD_ProcessTreeCommand(TreeCmd* cmd)
+{
+
+	switch (cmd->treeType) {
+	case BINARY:
+		switch (cmd->cmdType) {
+		case CMD_TREE_ADD:
+			BT_Add(cmd->val, cmd->tree);
+			break;
+		case CMD_TREE_DEL:
+			BT_Del(cmd->node, cmd->tree);
+			break;
+		}
+		break;
+
+	case BINARY_SEARCH:
+		switch (cmd->cmdType) {
+		case CMD_TREE_ADD:
+			BST_Add(cmd->val, cmd->tree);
+			break;
+		case CMD_TREE_DEL:
+			BST_Del(cmd->node, cmd->tree);
+			break;
+		}
+		break;
+
+	case RED_BLACK:
+		switch (cmd->cmdType) {
+		case CMD_TREE_ADD:
+			RB_Add(cmd->val, cmd->tree);
+			break;
+		case CMD_TREE_DEL:
+			RB_Del(cmd->node, cmd->tree);
+			break;
+		}
+
+		break;
+	}
+
 }

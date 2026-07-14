@@ -5,6 +5,10 @@ void CTX_AddCmd(UIContext* ctx, DrawCmd cmd)
 	ctx->drawCmds[ctx->drawCmdCount++] = cmd;
 }
 
+void CTX_AddTreeCmd(UIContext* ctx, TreeCmd cmd) {
+	ctx->treeCmds[ctx->treeCmdCount++] = cmd;
+}
+
 NodeUIState* CTX_UIGetOrCreate(UIStateMap* uiState, ID elemId)
 {
 	int start = (int)((elemId >> 4) % (ID)uiState->capacity);

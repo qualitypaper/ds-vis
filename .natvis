@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Node">
+
+   
+    <Expand>
+     <Item Name="id">id</Item>
+	 <Item Name="par">par</Item>
+     <Item Name="val">val</Item>
+	 <Item Name="color">color,X</Item>
+
+      <ArrayItems>
+        <Size>childCount</Size>
+        <ValuePointer>children</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+</AutoVisualizer>
