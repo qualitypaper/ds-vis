@@ -50,13 +50,12 @@ void RB_Add(int val, BT* bt);
 void RB_Del(Node* node, BT* bt);
 
 // avl
-int AVL_GetBalance(Node* root);
 int8_t AVL_CheckAndUpdateBalance(Node* node);
-void AVL_UpdateHeight(Node * node);
+Node* AVL_UpdateHeight(Node* node);
 BT AVL_Init(int preorder[], size_t len);
 void AVL2RB(BT* bt);
 
-void AVL_AddFixup(Node* node, int addedValue, BT* bt);
+void AVL_AddFixup(Node* node, Node* addedNode, BT* bt);
 void AVL_Add(int val, BT* bt);
 void AVL_DelFixup(Node* node, BT* bt);
 void AVL_Del(Node* node, BT* bt);

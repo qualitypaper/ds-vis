@@ -2,7 +2,7 @@
 #include "engine/tree_render.h"
 #include "ds/bt.h"
 
-bool done;
+int done;
 
 int main(void) {
 	W_Init("graph-vis");
@@ -15,6 +15,8 @@ int main(void) {
 	BT avl = AVL_Init(preorder, 1);
 
 	for (int i = 1; i < 10; i++) {
+		if (!W_PollEvents()) continue;
+
 		W_StartFrame();
 
 		AVL_Add(preorder[i], &avl);
@@ -23,7 +25,7 @@ int main(void) {
 		W_EndFrame();
 	}
 
-	for (done = false; !done; ) {
+	for (done = 0; !done; ) {
 		if (!W_PollEvents()) continue;
 
 		W_StartFrame();

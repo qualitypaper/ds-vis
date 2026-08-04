@@ -1,7 +1,7 @@
 #include "arena.h"
 #include <assert.h>
 
-void* A_Alloc(Arena* a, size_t n)
+void* A_Alloc(Arena* a, uint64_t n)
 {
 	// 16-byte align
 	n = (n + 15) & ~15;

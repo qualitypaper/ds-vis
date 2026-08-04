@@ -4,11 +4,11 @@
 
 typedef struct Arena {
 	uint8_t* base;
-	size_t size;
-	size_t used;
+	uint64_t size;
+	uint64_t used;
 } Arena;
 
-void* A_Alloc(Arena* a, size_t n);
+void* A_Alloc(Arena* a, uint64_t n);
 void A_Reset(Arena* a);
 
 #endif
