@@ -7,8 +7,10 @@ Node* Node_Alloc(int val, size_t slots) {
 	n->childCount = slots;
 	n->par = NULL;
 	n->val = val;
-	n->id = (ID)n; // ponytail: pointer-as-id, unique per allocation
+	n->id = (ID)n; // pointer-as-id, unique per allocation
 	n->color = FOREGROUND;
+	n->balance = 0;
+	n->height = 0;
 	return n;
 }
 

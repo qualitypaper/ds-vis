@@ -1,4 +1,5 @@
 #include "window.h"
+#include <assert.h>
 
 SDL_Window* win;
 SDL_Renderer* ren;
@@ -31,9 +32,10 @@ int W_Init(const char* title) {
 		width, height);
 	SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);
 
+
 	igCreateContext(NULL);
 	ImGuiIO* io = igGetIO();
-	io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;
+	io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	igStyleColorsDark(NULL);
 	ImGuiStyle* style = igGetStyle();
 	ImGuiStyle_ScaleAllSizes(style, scale);

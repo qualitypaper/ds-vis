@@ -6,7 +6,7 @@
 
 void CMD_ProcessDrawCommand(DrawCmd* cmd)
 {
-	ImDrawList* dl = igGetForegroundDrawList_ViewportPtr(NULL);
+	ImDrawList* dl = igGetBackgroundDrawList(NULL);
 	ImVec2_c p0 = { cmd->x0, cmd->y0 };
 	ImVec2_c p1 = { cmd->x1, cmd->y1 };
 
@@ -53,7 +53,7 @@ void CMD_ProcessTreeCommand(TreeCmd* cmd)
 		}
 		break;
 
-	case BINARY_SEARCH:
+	case BST:
 		switch (cmd->cmdType) {
 		case CMD_TREE_ADD:
 			BST_Add(cmd->val, cmd->tree);
@@ -73,7 +73,17 @@ void CMD_ProcessTreeCommand(TreeCmd* cmd)
 			RB_Del(cmd->node, cmd->tree);
 			break;
 		}
+		break;
 
+	case AVL:
+		switch (cmd->cmdType) {
+		case CMD_TREE_ADD:
+			AVL_Add(cmd->val, cmd->tree);
+			break;
+		case CMD_TREE_DEL:
+			AVL_Del(cmd->node, cmd->tree);
+			break;
+		}
 		break;
 	}
 

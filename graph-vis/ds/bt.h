@@ -12,13 +12,15 @@ DEFINE_LIST(Node*, NList)
 DEFINE_QUEUE(Node*, NQueue)
 
 typedef enum TreeType {
-	BINARY, BINARY_SEARCH, RED_BLACK
+	BINARY, BST, RED_BLACK, AVL
 } TreeType;
 
 typedef struct BT {
+	TreeType type;
 	Node* root;
 	size_t size;
 } BT;
+
 
 // bt
 Node* BT_Build(int preorder[], int inorder[], int ilower, int iupper, int index);
@@ -39,16 +41,26 @@ void     BST_Del(Node* node, BT* bt);
 // rb
 Node* RB_NodeAlloc(int val);
 BT RB_Init(int preorder[], size_t len);
-void RB_ResetSentinel();
 void RB_LeftRotate(Node* node, BT* bt);
 void RB_AddFixup(Node* node, BT* bt);
 void RB_RightRotate(Node* node, BT* bt);
-void RB_DelFixup(Node* fixupNode, BT* bt);
+void RB_DelFixup(Node* fixupNode, Node* parent, BT* bt);
 void RB_Transplant(Node* oldNode, Node* newNode, BT* bt);
 void RB_Add(int val, BT* bt);
 void RB_Del(Node* node, BT* bt);
 
+// avl
+int AVL_GetBalance(Node* root);
+int8_t AVL_CheckAndUpdateBalance(Node* node);
+void AVL_UpdateHeight(Node * node);
+BT AVL_Init(int preorder[], size_t len);
+void AVL2RB(BT* bt);
+
+void AVL_AddFixup(Node* node, int addedValue, BT* bt);
+void AVL_Add(int val, BT* bt);
+void AVL_DelFixup(Node* node, BT* bt);
+void AVL_Del(Node* node, BT* bt);
+
 uint16_t BT_Depth(const Node* root);
-void     BT_Print(const BT* bt);
 
 #endif

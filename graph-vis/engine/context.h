@@ -22,9 +22,13 @@ typedef struct UIContext {
 
 	float mouseX, mouseY;
 	int8_t mouseDown, mousePressed, mouseReleased;
+	int8_t mouseCaptured; /* ImGui window/popup wants the mouse; suppress manual node hit-testing */
 
 	ID hotId;
 	ID activeId;
+
+	struct Node* popupNode;
+	int8_t popupRequestOpen;
 
 	DrawCmd* drawCmds;
 	int drawCmdCount;

@@ -14,6 +14,7 @@ void R_AddConnectingLine(struct LayoutNode* layout, int childIdx);
 void R_EmitWidgets(struct Node* root, struct LayoutNode* layout);
 void R_BackendRender();
 void R_EmitControlWidgets(struct BT* bt);
+void R_EmitNodePopup(struct BT* bt);
 void R_TreeFrame(struct BT* tree, float x, float y);
 
 #endif
