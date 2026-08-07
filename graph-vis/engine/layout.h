@@ -1,15 +1,17 @@
 #ifndef GRAPH_VIS_LAYOUT
 #define GRAPH_VIS_LAYOUT
 
-#include "ds/node.h"
+#include "dsa/node.h"
 #include "context.h"
 
-typedef struct LayoutNode {
-	Node*              node;
-	float              x, y, subtreeWidth;
-	struct LayoutNode* children[2];
-} LayoutNode;
+typedef struct LayoutNode LayoutNode;
 
-float L_LayoutTree(Node *n, float depthY, float *cursorX, UIContext* ctx, LayoutNode *out);
+struct LayoutNode {
+	Node*              node;
+	F32              x, y, subtreeWidth;
+	LayoutNode* children[2];
+};
+
+F32 layout_tree(Node *n, F32 depthY, F32 *cursorX, UIContext* ctx, LayoutNode *out);
 
 #endif

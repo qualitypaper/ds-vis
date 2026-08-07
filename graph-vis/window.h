@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <SDL3/SDL.h>
 #include <cimgui.h>
-#include <cimgui_impl.h>
 
 #define igGetIO igGetIO_Nil
 

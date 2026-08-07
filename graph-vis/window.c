@@ -1,5 +1,7 @@
 #include "window.h"
 #include <assert.h>
+#include <cimgui_impl.h>
+#include "base/core.h"
 
 SDL_Window* win;
 SDL_Renderer* ren;
@@ -16,7 +18,7 @@ int W_Init(const char* title) {
 		return 1;
 	}
 
-	float scale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
+	F32 scale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
 	win = SDL_CreateWindow(title,
 		(int)(width * scale), (int)(height * scale),
 		SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);

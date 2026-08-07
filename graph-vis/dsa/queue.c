@@ -1,19 +1,19 @@
 #include "queue.h"
 
-struct AQueue AQ_Init(size_t cap) {
-	struct AQueue q = { L_Init(cap) };
+AQueue AQ_Init(size_t cap) {
+	AQueue q = { L_Init(cap) };
 	return q;
 }
 
-void AQ_Enqueue(int val, struct AQueue* q) { L_Add(val, &q->list); }
+void AQ_Enqueue(int val, AQueue* q) { L_Add(val, &q->list); }
 
-int AQ_Dequeue(struct AQueue* q) {
+int AQ_Dequeue(AQueue* q) {
 	int val = q->list.arr[0];
 	L_Del(0, &q->list);
 	return val;
 }
 
-int AQ_IsEmpty(struct AQueue* q) { return q->list.len == 0; }
+int AQ_IsEmpty(AQueue* q) { return q->list.len == 0; }
 
 struct FQueue FQ_Init(size_t cap) {
 	struct FQueue q = { (int*) malloc(cap * sizeof(int)), 0, 0, 0, cap };

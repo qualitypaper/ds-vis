@@ -50,6 +50,6 @@ static inline T Name##_Dequeue(struct Name* q) {                                
 static inline int Name##_IsEmpty(const struct Name* q) { return q->len == 0; }
 
 
-DEFINE_QUEUE(float, FlQueue);
+DEFINE_QUEUE(F32, FlQueue);
 
 #endif

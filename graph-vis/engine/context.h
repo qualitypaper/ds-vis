@@ -1,44 +1,46 @@
 #ifndef GRAPH_VIS_CONTEXT
 #define GRAPH_VIS_CONTEXT
 
-#include "defs.h"
-#include "arena.h"
+#include "base/arena.h"
+#include "base/core.h"
 #include "cmd.h"
 
 typedef struct NodeUIState {
 	ID id;
-	int8_t expanded;
-	float x, y;
+	S8 expanded;
+	F32 x, y;
 } NodeUIState;
 
 typedef struct UIStateMap {
 	NodeUIState* slots;
-	int capacity;
+	S32 capacity;
 } UIStateMap;
 
 typedef struct UIContext {
 	Arena* frameArena;
 	UIStateMap* uiStateMap;
 
-	float mouseX, mouseY;
-	int8_t mouseDown, mousePressed, mouseReleased;
-	int8_t mouseCaptured; /* ImGui window/popup wants the mouse; suppress manual node hit-testing */
+	F32 mouseX, mouseY;
+	S8 mouseDown, mousePressed, mouseReleased;
+	S8 mouseCaptured; /* ImGui window/popup wants the mouse; suppress manual node hit-testing */
 
 	ID hotId;
 	ID activeId;
 
-	struct Node* popupNode;
-	int8_t popupRequestOpen;
+	Node* popupNode;
+	S8 popupRequestOpen;
 
 	DrawCmd* drawCmds;
-	int drawCmdCount;
-	int drawCmdCap;
+	S32 drawCmdCount;
+	S32 drawCmdCap;
 
 	TreeCmd* treeCmds;
-	int treeCmdCount;
-	int treeCmdCap;
+	S32 treeCmdCount;
+	S32 treeCmdCap;
 
 } UIContext;
+
+UIContext* context_init(Arena* arena);
 
 void CTX_AddCmd(UIContext* ctx, DrawCmd cmd);
 void CTX_AddTreeCmd(UIContext* ctx, TreeCmd cmd);

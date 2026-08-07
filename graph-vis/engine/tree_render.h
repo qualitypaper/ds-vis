@@ -1,20 +1,19 @@
 #ifndef GRAPH_VIS_TREE_RENDER
 #define GRAPH_VIS_TREE_RENDER
 
-struct ImVec2_c;
-struct BT;
-struct Node;
-struct UIContext;
-struct LayoutNode;
+#include "base/core.h"
+#include "dsa/bt.h"
+#include "engine/layout.h"
 
-void R_Init();
-int R_TreeWidget(const struct Node* node, float x, float y);
-void R_AddConnectingLine(struct LayoutNode* layout, int childIdx);
+void render_init();
+S32 tree_widget(const Node* node, F32 x, F32 y, BT* bt);
+void add_connecting_line(LayoutNode* layout, int childIdx);
 
-void R_EmitWidgets(struct Node* root, struct LayoutNode* layout);
-void R_BackendRender();
-void R_EmitControlWidgets(struct BT* bt);
-void R_EmitNodePopup(struct BT* bt);
-void R_TreeFrame(struct BT* tree, float x, float y);
+void emit_widgets(Node* root, LayoutNode* layout, BT* bt);
+void backend_render();
+void emit_control_widgets(BT* bt);
+void emit_tree_type_popup(BT* bt);
+
+void tree_frame(BT* tree, F32 x, F32 y);
 
 #endif

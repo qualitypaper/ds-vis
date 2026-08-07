@@ -16,7 +16,7 @@ target_link_libraries(imgui_backends PRIVATE cimgui SDL3::SDL3)
 set_property(TARGET imgui_backends PROPERTY CXX_STANDARD 20)
 
 file(GLOB_RECURSE GRAPH_VIS_SOURCES CONFIGURE_DEPENDS "*.c" "*.h")
-add_executable(graph-vis ${GRAPH_VIS_SOURCES} "engine/context.h" "defs.h"  "engine/layout.h" "engine/cmd.c")
+add_executable(graph-vis ${GRAPH_VIS_SOURCES})
 set_property(TARGET graph-vis PROPERTY C_STANDARD 17)
 target_compile_definitions(graph-vis PRIVATE
     CIMGUI_DEFINE_ENUMS_AND_STRUCTS=1
