@@ -1,7 +1,7 @@
 #include "queue.h"
 
-AQueue AQ_Init(size_t cap) {
-	AQueue q = { L_Init(cap) };
+AQueue AQ_Init(Arena* arena, size_t cap) {
+	AQueue q = { L_Init(arena, cap) };
 	return q;
 }
 
@@ -15,8 +15,8 @@ int AQ_Dequeue(AQueue* q) {
 
 int AQ_IsEmpty(AQueue* q) { return q->list.len == 0; }
 
-struct FQueue FQ_Init(size_t cap) {
-	struct FQueue q = { (int*) malloc(cap * sizeof(int)), 0, 0, 0, cap };
+struct FQueue FQ_Init(Arena* arena, size_t cap) {
+	struct FQueue q = { PushArray(arena, int, cap), 0, 0, 0, cap };
 	return q;
 }
 

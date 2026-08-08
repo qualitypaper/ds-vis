@@ -23,7 +23,7 @@ typedef struct {
 	BT* tree;
 	union {
 		S32 val;
-		Node* node;
+		BNode* node;
 		TreeTransformationType transform;
 	};
 } TreeCmd;

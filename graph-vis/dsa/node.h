@@ -4,25 +4,26 @@
 #include "base/core.h"
 #include "base/arena.h"
 
-typedef struct Node Node;
-struct Node {
-	ID id;
-	Node** children;
-	U64        childCount;
-	Node* par;
-	S32           val;
-	S32 balance; // for AVL trees
-	S32 height;  // for AVL trees
-	COLOR color;
+typedef struct BNode BNode;
+
+struct BNode
+{
+    ID id;
+    BNode* left;
+    BNode* right;
+    BNode* par;
+    S32 val;
+    S32 balance; // for AVL trees
+    S32 height; // for AVL trees
+    COLOR color;
 };
 
-Node* node_alloc(Arena* arena, S32 val, U64 slots);
+BNode* bnode_alloc_nil(Arena* arena, S32 val, BNode* nil);
+#define bnode_alloc(arena, val) (bnode_alloc_nil(arena, val, NULL))
 
-#define IsLeftChild(node) ((node->par->children[0]) == node)
-#define IsRightChild(node) ((node->par->children[1]) == node)
-
-#define NodeLeft(n)	((n)->children[0])
-#define NodeRight(n)	((n)->children[1])
-#define NodeSibling(n) (IsLeftChild(n) ? NodeRight(n->par) : NodeLeft(n->par))
+#define BLeft(n)           ((n)->left)
+#define BRight(n)          ((n)->right)
+#define BIsLeftChild(node)  ((node)->par->left == (node))
+#define BIsRightChild(node) ((node)->par->right == (node))
 
 #endif

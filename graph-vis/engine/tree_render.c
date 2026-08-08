@@ -17,23 +17,21 @@
 static UIContext* ctx;
 static char* valueBuffer;
 
-extern Node* sentinel;
-extern BT* tree;
-
 void render_init()
 {
     Arena* persistentArena = arena_alloc(ARENA_SIZE); /* UIContext, uiStateMap, command buffers */
-    Arena* frameArena = arena_alloc(ARENA_SIZE);      /* per-frame LayoutNodes */
+    Arena* frameArena = arena_alloc(ARENA_SIZE); /* per-frame LayoutNodes */
 
     ctx = context_init(persistentArena);
     ctx->frameArena = frameArena;
 
-    valueBuffer = calloc(VALUE_SIZE, sizeof(char));
+    valueBuffer = PushArrayNoZero(persistentArena, char, VALUE_SIZE);
+    MemorySet(valueBuffer, 0, VALUE_SIZE);
 }
 
-S32 tree_widget(const Node* node, F32 x, F32 y, BT *bt)
+S32 tree_widget(const BNode* node, F32 x, F32 y, BT* bt)
 {
-    if (!node || node == sentinel) return 0;
+    if (!IsValid(node)) return 0;
 
     NodeUIState* st = CTX_UIGetOrCreate(ctx->uiStateMap, node->id);
 
@@ -53,10 +51,10 @@ S32 tree_widget(const Node* node, F32 x, F32 y, BT *bt)
 
     S8 isPopupTarget = ctx->popupNode == node;
     COLOR color = (ctx->activeId == node->id || isPopupTarget)
-                         ? 0xFFFF0000
-                         : (ctx->hotId == node->id)
-                         ? 0xFFFFFF00
-                         : node->color;
+                      ? 0xFFFF0000
+                      : (ctx->hotId == node->id)
+                      ? 0xFFFFFF00
+                      : node->color;
 
     CTX_AddCmd(ctx, (DrawCmd){CMD_CIRCLE, x, y, w, 0, color, NULL});
     CTX_AddCmd(ctx, (DrawCmd){CMD_NUM, x, y, 0, 0, FONT_COLOR, .num = node->val});
@@ -75,7 +73,7 @@ S32 tree_widget(const Node* node, F32 x, F32 y, BT *bt)
     if (clicked)
     {
         st->expanded = !st->expanded;
-        ctx->popupNode = (Node*)node;
+        ctx->popupNode = (BNode*)node;
         ctx->popupRequestOpen = 1;
     }
     st->x = x;
@@ -85,9 +83,9 @@ S32 tree_widget(const Node* node, F32 x, F32 y, BT *bt)
     return clicked;
 }
 
-void add_connecting_line(LayoutNode* layout, int childIdx)
+void add_connecting_line(LayoutTreeNode* layout, int childIdx)
 {
-    LayoutNode* child = layout->children[childIdx];
+    LayoutTreeNode* child = layout->children[childIdx];
     if (!child) return;
 
     F32 dx = fabsf(child->x - layout->x);
@@ -107,17 +105,19 @@ void add_connecting_line(LayoutNode* layout, int childIdx)
     CTX_AddCmd(ctx, (DrawCmd){CMD_LINE, prevPos.x, prevPos.y, child->x, child->y, FONT_COLOR, .num = 3});
 }
 
-void emit_widgets(Node* root, LayoutNode* layout, BT *bt)
+void emit_widgets(BNode* root, LayoutTreeNode* layout, BT* bt)
 {
-    if (!root || root == sentinel || !layout) return;
+    if (!IsValid(root) || !layout) return;
 
-    for (int i = 0; i < root->childCount; i++)
+    if (IsValid(root->left))
     {
-        Node* child = root->children[i];
-        if (!child || child == sentinel) continue;
-
-        add_connecting_line(layout, i);
-        emit_widgets(child, layout->children[i], bt);
+        add_connecting_line(layout, 0);
+        emit_widgets(root->left, layout->children[0], bt);
+    }
+    if (IsValid(root->right))
+    {
+        add_connecting_line(layout, 1);
+        emit_widgets(root->right, layout->children[1], bt);
     }
 
     tree_widget(root, layout->x, layout->y, bt);
@@ -164,25 +164,25 @@ void emit_node_popup(BT* bt)
 
     if (!igBeginPopup("Node Info", 0)) return;
 
-    Node* n = ctx->popupNode;
+    BNode* n = ctx->popupNode;
     if (n)
     {
         igText("Value: %d", n->val);
         if (bt->type == RED_BLACK) igText("Color: %s", n->color == RED ? "Red" : "Black");
 
-        Node* par = (n->par && n->par != sentinel) ? n->par : NULL;
-        if (!par)
+        const BNode* par = n->par;
+
+        if (!IsValid(par))
         {
             igText("Siblings: none (root)");
         }
         else
         {
-            for (size_t i = 0; i < par->childCount; i++)
-            {
-                Node* sib = par->children[i];
-                if (!sib || sib == sentinel || sib == n) continue;
+            const BNode* sib = BIsLeftChild(n) ? par->right : par->left;
+            if (IsValid(sib) && sib != n)
                 igText("Sibling: %d", sib->val);
-            }
+            else
+                igText("No siblings");
         }
 
         igSeparator();
@@ -308,9 +308,8 @@ void tree_frame(BT* bt, F32 x, F32 y)
     ctx->treeCmdCount = 0;
     ctx->hotId = 0;
 
-    F32 cursorX = x;
-    LayoutNode* node = PushStruct(ctx->frameArena, LayoutNode);
-    layout_tree(bt->root, y, &cursorX, ctx, node);
+    LayoutTreeNode* node = PushStruct(ctx->frameArena, LayoutTreeNode);
+    layout_tree(bt->root, y, x, ctx, node);
 
     emit_widgets(bt->root, node, bt);
     emit_control_widgets(bt);

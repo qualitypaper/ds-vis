@@ -17,6 +17,16 @@ typedef struct RenderCell RenderCell;
 struct RenderCell
 {
     void* v;
+    U64 valueSize;
+    F32 x, y;
+    union
+    {
+        U32 radius;
+        U32 width;
+        U32 fontSize;
+    };
+    U32 height;
+    U32 rotation;
     U32 color;
     U32 borderColor;
     RenderCellType type;

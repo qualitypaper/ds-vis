@@ -27,7 +27,7 @@ typedef struct UIContext {
 	ID hotId;
 	ID activeId;
 
-	Node* popupNode;
+	BNode* popupNode;
 	S8 popupRequestOpen;
 
 	DrawCmd* drawCmds;

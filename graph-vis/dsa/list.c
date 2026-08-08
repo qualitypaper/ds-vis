@@ -1,13 +1,17 @@
 #include "list.h"
 
-struct List L_Init(size_t cap) {
-	struct List list = { (int*) malloc(cap * sizeof(int)), 0, cap };
+struct List L_Init(Arena* arena, size_t cap) {
+	struct List list = { PushArray(arena, S32, cap), 0, cap, arena };
 	return list;
 }
 
 void L_Grow(struct List* list) {
-	list->cap = (size_t)(list->cap * GROWTH_FACTOR);
-	list->arr = (int*) realloc(list->arr, list->cap * sizeof(int));
+	size_t newcap = (size_t)(list->cap * GROWTH_FACTOR);
+	if (newcap <= list->cap) newcap = list->cap + 1; /* 1.6 floors to 1 for tiny caps */
+	S32* newarr = PushArray(list->arena, S32, newcap);
+	MemoryCopy(newarr, list->arr, list->len * sizeof(S32));
+	list->arr = newarr;
+	list->cap = newcap;
 }
 
 void L_Add(int val, struct List* list) {
@@ -29,15 +33,15 @@ SLinkedList SLL_Init(void) {
 	return l;
 }
 
-void SLL_PushFront(S32 val, SLinkedList* l) {
-	SLinkedNode* n = (SLinkedNode*) malloc(sizeof(SLinkedNode));
+void SLL_PushFront(Arena* arena, S32 val, SLinkedList* l) {
+	SLinkedNode* n = PushStruct(arena, SLinkedNode);
 	n->val = val;
 	n->next = l->head;
 	l->head = n;
 }
 
-void SLL_PushBack(S32 val, SLinkedList* l) {
-	SLinkedNode* n = (SLinkedNode*) malloc(sizeof(SLinkedNode));
+void SLL_PushBack(Arena* arena, S32 val, SLinkedList* l) {
+	SLinkedNode* n = PushStruct(arena, SLinkedNode);
 	n->val = val;
 	n->next = NULL;
 	if (l->head == NULL) {
@@ -53,7 +57,6 @@ S32 SLL_PopFront(SLinkedList* l) {
 	SLinkedNode* n = l->head;
 	S32 val = n->val;
 	l->head = n->next;
-	free(n);
 	return val;
 }
 
@@ -71,7 +74,6 @@ void SLL_Delete(SLinkedNode* node, SLinkedList* l) {
 		while (p != NULL && p->next != node) p = p->next;
 		if (p != NULL) p->next = node->next;
 	}
-	free(node);
 }
 
 size_t SLL_Count(const SLinkedList* l) {
@@ -81,12 +83,6 @@ size_t SLL_Count(const SLinkedList* l) {
 }
 
 void SLL_Free(SLinkedList* l) {
-	SLinkedNode* n = l->head;
-	while (n != NULL) {
-		SLinkedNode* nx = n->next;
-		free(n);
-		n = nx;
-	}
 	l->head = NULL;
 }
 
@@ -98,8 +94,8 @@ LinkedList LL_Init(void) {
 	return l;
 }
 
-void LL_PushFront(S32 val, LinkedList* l) {
-	LinkedNode* n = (LinkedNode*) malloc(sizeof(LinkedNode));
+void LL_PushFront(Arena* arena, S32 val, LinkedList* l) {
+	LinkedNode* n = PushStruct(arena, LinkedNode);
 	n->val = val;
 	n->prev = NULL;
 	n->next = l->head;
@@ -108,8 +104,8 @@ void LL_PushFront(S32 val, LinkedList* l) {
 	l->head = n;
 }
 
-void LL_PushBack(S32 val, LinkedList* l) {
-	LinkedNode* n = (LinkedNode*) malloc(sizeof(LinkedNode));
+void LL_PushBack(Arena* arena, S32 val, LinkedList* l) {
+	LinkedNode* n = PushStruct(arena, LinkedNode);
 	n->val = val;
 	n->prev = l->tail;
 	n->next = NULL;
@@ -124,7 +120,6 @@ S32 LL_PopFront(LinkedList* l) {
 	l->head = n->next;
 	if (l->head != NULL) l->head->prev = NULL;
 	else l->tail = NULL;
-	free(n);
 	return val;
 }
 
@@ -134,7 +129,6 @@ S32 LL_PopBack(LinkedList* l) {
 	l->tail = n->prev;
 	if (l->tail != NULL) l->tail->next = NULL;
 	else l->head = NULL;
-	free(n);
 	return val;
 }
 
@@ -149,7 +143,6 @@ void LL_Delete(LinkedNode* node, LinkedList* l) {
 	else l->head = node->next;
 	if (node->next != NULL) node->next->prev = node->prev;
 	else l->tail = node->prev;
-	free(node);
 }
 
 size_t LL_Count(const LinkedList* l) {
@@ -159,11 +152,5 @@ size_t LL_Count(const LinkedList* l) {
 }
 
 void LL_Free(LinkedList* l) {
-	LinkedNode* n = l->head;
-	while (n != NULL) {
-		LinkedNode* nx = n->next;
-		free(n);
-		n = nx;
-	}
 	l->head = l->tail = NULL;
 }

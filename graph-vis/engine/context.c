@@ -2,7 +2,7 @@
 
 #define DRAW_CMDS_SIZE 256
 #define TREE_CMDS_SIZE 128
-#define UI_SLOTS 64
+#define UI_SLOTS 128
 
 UIContext* context_init(Arena* arena)
 {

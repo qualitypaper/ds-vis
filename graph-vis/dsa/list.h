@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include "base/core.h"
+#include "base/arena.h"
 
 #define GROWTH_FACTOR 1.6
 
@@ -13,22 +14,26 @@ struct List
     S32* arr;
     U64 len;
     U64 cap;
+    Arena* arena; // backing bump arena; grow reallocates a new slab (no free)
 };
 
-List L_Init(size_t cap);
+List L_Init(Arena* arena, size_t cap);
 void L_Grow(List* list);
 void L_Add(int val, List* list);
 void L_Del(size_t index, List* list);
 
 #define DEFINE_LIST(T, Name)                                                                          \
-typedef struct Name { T* arr; size_t len, cap; } Name;                                                             \
-static inline struct Name Name##_Init(size_t cap) {                                                   \
-    struct Name l = { (T*) malloc(cap * sizeof(T)), 0, cap };                                         \
+typedef struct Name { T* arr; size_t len, cap; Arena* arena; } Name;                                                  \
+static inline struct Name Name##_Init(Arena* arena, size_t cap) {                                    \
+    struct Name l = { PushArray(arena, T, cap), 0, cap, arena };                                     \
     return l;                                                                                         \
 }                                                                                                     \
 static inline void Name##_Grow(struct Name* l) {                                                      \
-    l->cap = (size_t)(l->cap * GROWTH_FACTOR);                                                        \
-    l->arr = (T*) realloc(l->arr, l->cap * sizeof(T));                                                \
+    size_t newcap = (size_t)(l->cap * GROWTH_FACTOR);                                                 \
+    if (newcap <= l->cap) newcap = l->cap + 1; /* 1.6 floors to 1 for tiny caps */                    \
+    T* newarr = PushArray(l->arena, T, newcap);                                                       \
+    MemoryCopy(newarr, l->arr, l->len * sizeof(T));                                                   \
+    l->arr = newarr; l->cap = newcap;                                                                 \
 }                                                                                                     \
 static inline void Name##_Add(T val, struct Name* l) {                                                \
     if (l->len >= l->cap) Name##_Grow(l);                                                             \
@@ -78,8 +83,8 @@ struct LinkedList
 //~ Concrete linked lists (S32, null-terminated)
 
 SLinkedList SLL_Init(void);
-void SLL_PushFront(S32 val, SLinkedList* l);
-void SLL_PushBack(S32 val, SLinkedList* l);
+void SLL_PushFront(Arena* arena, S32 val, SLinkedList* l);
+void SLL_PushBack(Arena* arena, S32 val, SLinkedList* l);
 S32  SLL_PopFront(SLinkedList* l);
 SLinkedNode* SLL_Find(S32 val, const SLinkedList* l);
 void SLL_Delete(SLinkedNode* node, SLinkedList* l);
@@ -87,8 +92,8 @@ size_t SLL_Count(const SLinkedList* l);
 void SLL_Free(SLinkedList* l);
 
 LinkedList LL_Init(void);
-void LL_PushFront(S32 val, LinkedList* l);
-void LL_PushBack(S32 val, LinkedList* l);
+void LL_PushFront(Arena* arena, S32 val, LinkedList* l);
+void LL_PushBack(Arena* arena, S32 val, LinkedList* l);
 S32  LL_PopFront(LinkedList* l);
 S32  LL_PopBack(LinkedList* l);
 LinkedNode* LL_Find(S32 val, const LinkedList* l);
@@ -108,14 +113,14 @@ void LL_Free(LinkedList* l);
 // Node must have `val` (+ `next`; + `prev` for doubly). List must have `head`.
 
 #define DEFINE_SINGLY_LINKED_LIST(T, NodeT, ListT, END)                                            \
-    static inline void ListT##_PushFront(T val, struct ListT* l) {                                 \
-        struct NodeT* n = (struct NodeT*) malloc(sizeof(struct NodeT));                            \
+    static inline void ListT##_PushFront(Arena* arena, T val, struct ListT* l) {                   \
+        struct NodeT* n = PushStruct(arena, struct NodeT);                                         \
         n->val = val;                                                                              \
         n->next = l->head;                                                                         \
         l->head = n;                                                                               \
     }                                                                                              \
-    static inline void ListT##_PushBack(T val, struct ListT* l) {                                  \
-        struct NodeT* n = (struct NodeT*) malloc(sizeof(struct NodeT));                            \
+    static inline void ListT##_PushBack(Arena* arena, T val, struct ListT* l) {                    \
+        struct NodeT* n = PushStruct(arena, struct NodeT);                                         \
         n->val = val;                                                                              \
         n->next = END;                                                                             \
         if (l->head == END) l->head = n;                                                           \
@@ -125,7 +130,6 @@ void LL_Free(LinkedList* l);
         struct NodeT* n = l->head;                                                                 \
         T val = n->val;                                                                            \
         l->head = n->next;                                                                         \
-        free(n);                                                                                   \
         return val;                                                                                \
     }                                                                                              \
     static inline struct NodeT* ListT##_Find(T val, const struct ListT* l) {                       \
@@ -138,7 +142,6 @@ void LL_Free(LinkedList* l);
         else { struct NodeT* p = l->head;                                                          \
                while (p != END && p->next != node) p = p->next;                                    \
                if (p != END) p->next = node->next; }                                               \
-        free(node);                                                                                \
     }                                                                                              \
     static inline size_t ListT##_Count(const struct ListT* l) {                                    \
         size_t c = 0;                                                                              \
@@ -146,8 +149,6 @@ void LL_Free(LinkedList* l);
         return c;                                                                                  \
     }                                                                                              \
     static inline void ListT##_Free(struct ListT* l) {                                             \
-        struct NodeT* n = l->head;                                                                 \
-        while (n != END) { struct NodeT* nx = n->next; free(n); n = nx; }                          \
         l->head = END;                                                                             \
     }
 
@@ -161,8 +162,8 @@ void LL_Free(LinkedList* l);
     static inline int ListT##_IsEmpty(const struct ListT* l) {                                     \
         return ListT##_First(l) == END;                                                            \
     }                                                                                              \
-    static inline void ListT##_PushFront(T val, struct ListT* l) {                                 \
-        struct NodeT* n = (struct NodeT*) malloc(sizeof(struct NodeT));                            \
+    static inline void ListT##_PushFront(Arena* arena, T val, struct ListT* l) {                   \
+        struct NodeT* n = PushStruct(arena, struct NodeT);                                         \
         n->val = val;                                                                              \
         if (END) {                                                                                 \
             n->prev = END;                                                                         \
@@ -177,8 +178,8 @@ void LL_Free(LinkedList* l);
             l->head = n;                                                                           \
         }                                                                                          \
     }                                                                                              \
-    static inline void ListT##_PushBack(T val, struct ListT* l) {                                  \
-        struct NodeT* n = (struct NodeT*) malloc(sizeof(struct NodeT));                            \
+    static inline void ListT##_PushBack(Arena* arena, T val, struct ListT* l) {                    \
+        struct NodeT* n = PushStruct(arena, struct NodeT);                                         \
         n->val = val;                                                                              \
         if (END) {                                                                                 \
             n->prev = END->prev;                                                                   \
@@ -204,7 +205,6 @@ void LL_Free(LinkedList* l);
             if (l->head) l->head->prev = 0;                                                        \
             else l->tail = 0;                                                                      \
         }                                                                                          \
-        free(n);                                                                                   \
         return val;                                                                                \
     }                                                                                              \
     static inline T ListT##_PopBack(struct ListT* l) {                                             \
@@ -218,7 +218,6 @@ void LL_Free(LinkedList* l);
             if (l->tail) l->tail->next = 0;                                                        \
             else l->head = 0;                                                                      \
         }                                                                                          \
-        free(n);                                                                                   \
         return val;                                                                                \
     }                                                                                              \
     static inline struct NodeT* ListT##_Find(T val, const struct ListT* l) {                       \
@@ -236,7 +235,6 @@ void LL_Free(LinkedList* l);
             if (node->next) node->next->prev = node->prev;                                         \
             else l->tail = node->prev;                                                             \
         }                                                                                          \
-        free(node);                                                                                \
     }                                                                                              \
     static inline size_t ListT##_Count(const struct ListT* l) {                                    \
         size_t c = 0;                                                                              \
@@ -244,8 +242,6 @@ void LL_Free(LinkedList* l);
         return c;                                                                                  \
     }                                                                                              \
     static inline void ListT##_Free(struct ListT* l) {                                             \
-        struct NodeT* n = ListT##_First(l);                                                        \
-        while (n != END) { struct NodeT* nx = n->next; free(n); n = nx; }                          \
         if (END) { END->next = END; END->prev = END; }                                             \
         else { l->head = 0; l->tail = 0; }                                                         \
     }

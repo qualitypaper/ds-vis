@@ -6,10 +6,10 @@
 #include "engine/layout.h"
 
 void render_init();
-S32 tree_widget(const Node* node, F32 x, F32 y, BT* bt);
-void add_connecting_line(LayoutNode* layout, int childIdx);
+S32 tree_widget(const BNode* node, F32 x, F32 y, BT* bt);
+void add_connecting_line(LayoutTreeNode* layout, int childIdx);
 
-void emit_widgets(Node* root, LayoutNode* layout, BT* bt);
+void emit_widgets(BNode* root, LayoutTreeNode* layout, BT* bt);
 void backend_render();
 void emit_control_widgets(BT* bt);
 void emit_tree_type_popup(BT* bt);
